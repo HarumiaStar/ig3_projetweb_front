@@ -1,12 +1,24 @@
 <script setup lang="ts">
-
 import { ref } from 'vue'
-const data = ref([])
+import { useRouter } from "vue-router"
 
-fetch(import.meta.env.VITE_API_URL + "users")
-    .then((res) => res.json())
-    .then((json) => data.value = json)
-    .catch((err) => console.log(err))
+const data = ref([])
+const router = useRouter()
+
+function getData(){
+  fetch(import.meta.env.VITE_API_URL + "users")
+      .then((res) => res.json())
+      .then((json) => data.value = json)
+      .catch((err) => console.log(err))
+}
+
+function supprimer(id){
+  fetch(import.meta.env.VITE_API_URL + "users/" + id, { method: 'DELETE' })
+    .then(()=> (getData()))
+    .catch(()=> (getData()))
+}
+
+getData()
 </script>
 
 <template>
@@ -14,7 +26,7 @@ fetch(import.meta.env.VITE_API_URL + "users")
        
     <o-table :data="data">
         <o-table-column field="_id" label="ID" numeric v-slot:default="props">
-          {{ props.row._id }}
+          <RouterLink :to="{name: 'userRead', params:{id: props.row._id}}"> {{ props.row._id }} </RouterLink>
         </o-table-column>
         
         <o-table-column field="name" label="Prénom" numeric v-slot:default="props">
@@ -47,6 +59,15 @@ fetch(import.meta.env.VITE_API_URL + "users")
         
         <o-table-column field="is_admin" label="Administrateur" numeric v-slot:default="props">
           {{ props.row.is_admin === false ? "✖️" : "✔️"}}
+        </o-table-column>
+
+
+        <o-table-column field="action" label="Action" numeric v-slot:default="props">
+          <RouterLink :to="{name: 'userEdit', params:{id: props.row._id}}" class="button is-warning">
+                  Editer
+          </RouterLink>
+
+          <div class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
         </o-table-column>
    
     </o-table>

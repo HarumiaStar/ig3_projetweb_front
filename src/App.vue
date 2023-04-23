@@ -51,19 +51,19 @@ document.addEventListener('DOMContentLoaded', () => {
               Utilisateurs
             </RouterLink>
           </div>
-          <!--
+
           <div class="navbar-end">
             <div class="navbar-item">
               <div class="buttons">
-                <a class="button is-primary">
-                  <strong>Sign up</strong>
-                </a>
+                <RouterLink to="/users/register" class="button is-primary">
+                  Inscription
+                </RouterLink><!--
                 <a class="button is-light">
                   Log in
-                </a>
+                </a>-->
               </div>
             </div>
-          </div> -->
+          </div>
         </div>
       </nav>
   </header>
