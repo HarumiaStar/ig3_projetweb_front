@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
   // Add a click event on each of them
-  $navbarBurgers.forEach( el => {
+  $navbarBurgers.forEach(el => {
     el.addEventListener('click', () => {
 
       // Get the target from the "data-target" attribute
@@ -27,48 +27,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <template>
   <header>
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+    <nav>
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/about">About</RouterLink>
+    </nav>
 
-      <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-          <RouterLink class="navbar-item" to="/">
-            PolyMovies
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <RouterLink class="navbar-item" to="/">
+          PolyMovies
+        </RouterLink>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <RouterLink to="/users" class="navbar-item">
+            Utilisateurs
           </RouterLink>
 
-          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-          </a>
+          <RouterLink to="/films" class="navbar-item">
+            Films
+          </RouterLink>
         </div>
 
-        <div id="navbarBasicExample" class="navbar-menu">
-          <div class="navbar-start">
-            <RouterLink to="/users" class="navbar-item">
-              Utilisateurs
-            </RouterLink>
-          </div>
-
-          <div class="navbar-end">
-            <div class="navbar-item">
-              <div class="buttons">
-                <RouterLink to="/users/register" class="button is-primary">
-                  Inscription
-                </RouterLink><!--
-                <a class="button is-light">
-                  Log in
-                </a>-->
-              </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <RouterLink to="/users/register" class="button is-primary">
+                Inscription
+              </RouterLink>
+              <RouterLink to="/users/login" class="button is-info">
+                Connexion
+              </RouterLink>
             </div>
           </div>
         </div>
-      </nav>
+      </div>
+    </nav>
   </header>
 
-  <RouterView />
+  <div class="container">
+    <RouterView />
+  </div>
 
   <footer>
     <p>Author: Suzanne R.</p>

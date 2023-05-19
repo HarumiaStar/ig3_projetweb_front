@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from "vue-router"
+import { User } from '../../utils/user'
+import { errorNotif } from '../../utils/notification'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,10 +18,14 @@ const form = ref({
     newPassword: undefined
 })
 
-fetch(import.meta.env.VITE_API_URL + "users/" + id)
-.then(response => {
-    if (response.ok) return response.json();
-    else router.replace({name: "userIndex"})
+fetch(import.meta.env.VITE_API_URL + "users/" + id, User.getInstance().generateHeaders())
+.then(async response => {
+    const res = await response.json();
+    if (response.ok) return res
+    else {
+        errorNotif("Token d'acces non valide ou innexistant")
+        router.replace({name: "userLogin"})
+    }
 })
 .then(json => {
     form.value = {
@@ -31,16 +37,30 @@ fetch(import.meta.env.VITE_API_URL + "users/" + id)
 
 function updateForm(event: any){
     event.preventDefault()
+    const user = User.getInstance()
 
     const requestOptions = {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Authorization": "Bearer " + user.getToken(),
+            "Content-Type": "application/json",
+        },
         body: JSON.stringify(form.value)
     }
 
     fetch(import.meta.env.VITE_API_URL + "users/" + id, requestOptions)
-    .then(response => response.json())
-    .then(data => (router.replace({name: "userRead"})));
+    .then(async response => {
+        console.log(response)
+        const json = await response.json()
+        if (response.ok) {
+            if (json._id === user.getData()._id){
+                User.clearStorage()
+                router.replace({name: "userLogin"})
+            }
+            else router.replace({name: "userRead"})
+        }
+        else errorNotif("Token d'acces non valide ou innexistant")
+    })
 }
 
 </script>

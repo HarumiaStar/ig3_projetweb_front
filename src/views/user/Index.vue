@@ -1,21 +1,33 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from "vue-router"
+import { User } from '../../utils/user'
+import { errorNotif } from '../../utils/notification'
 
 const data = ref([])
 const router = useRouter()
 
 function getData(){
-  fetch(import.meta.env.VITE_API_URL + "users")
-      .then((res) => res.json())
-      .then((json) => data.value = json)
-      .catch((err) => console.log(err))
+  fetch(import.meta.env.VITE_API_URL + "users", User.getInstance().generateHeaders())
+  .then((res) => res.json())
+  .then((json) => data.value = json)
+  .catch((err) => console.log(err))
 }
 
 function supprimer(id){
-  fetch(import.meta.env.VITE_API_URL + "users/" + id, { method: 'DELETE' })
-    .then(()=> (getData()))
-    .catch(()=> (getData()))
+  const optionRequest = User.getInstance().generateHeaders()
+  optionRequest.method = 'DELETE'
+  console.log(id)
+  fetch(import.meta.env.VITE_API_URL + "users/" + id, optionRequest)
+  .then(async (res)=> {
+    const json = await res.json()
+    if (res.ok) return getData()
+    else {
+        errorNotif("Token d'acces non valide ou innexistant")
+        router.replace({name: "userLogin"})
+      }
+  })
+  .catch(()=> (getData()))
 }
 
 getData()
