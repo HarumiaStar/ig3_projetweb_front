@@ -17,26 +17,25 @@ const route = useRoute()
 let id = route.params.id;
 
 const data = ref({
-    title: "",
-    overview: "",
-    poster_path: "",
-    release_date: "",
-    genres: [],
+    date: "",
+    film: "",
+    cinema: "",
 });
 
 if (props.mode === 'read' || props.mode === 'edit') {
     if (id === "" || id === undefined) {
-        router.push({ name: 'filmIndex' })
+        router.push({ name: 'sessionIndex' })
     }
     else {
-        fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest).then((res) => {
+        fetch(import.meta.env.VITE_API_URL + "sessions/" + id, optionRequest).then((res) => {
             res.json().then((resp) => {
                 delete resp.__v
                 delete resp._id
+                delete resp.film.genres
 
                 data.value = {
                     ...resp,
-                    release_date: resp.release_date.substring(0, 10)
+                    date: resp.date.substring(0, 16)
                 }
             });
         });
@@ -44,28 +43,42 @@ if (props.mode === 'read' || props.mode === 'edit') {
 }
 
 
-const genres = ref([]);
+const films = ref([]);
+const cinemas = ref([]);
 
-const fetchGenres = () => {
-    fetch(import.meta.env.VITE_API_URL + "genres", optionRequest).then((res) => {
+const fetchFilms = () => {
+    fetch(import.meta.env.VITE_API_URL + "films", optionRequest).then((res) => {
         res.json().then((resp) => {
-            genres.value = resp
+            films.value = resp
+            films.value.forEach((film: any) => {
+                delete film.genres
+            });
+        });
+    });
+};
+const fetchCinemas = () => {
+    fetch(import.meta.env.VITE_API_URL + "cinemas", optionRequest).then((res) => {
+        res.json().then((resp) => {
+            cinemas.value = resp
         });
     });
 };
 
 if (props.mode !== 'read') {
-    fetchGenres()
+    fetchFilms()
+    fetchCinemas()
 }
 
 watch(
     () => props.mode,
     () => {
         if (props.mode !== 'read') {
-            fetchGenres()
+            fetchFilms()
+            fetchCinemas()
         }
     }
 );
+
 
 watch(() => route.params.id, (newValue) => {
     id = newValue
@@ -76,7 +89,7 @@ const isReadMode = computed(() => props.mode === 'read');
 const updateForm = (e: any) => {
     e.preventDefault();
 
-    let url = import.meta.env.VITE_API_URL + "films";
+    let url = import.meta.env.VITE_API_URL + "sessions";
     if (props.mode !== 'create') url += "/" + id
 
     fetch(url, {
@@ -86,7 +99,7 @@ const updateForm = (e: any) => {
     }).then((res) => {
         res.json().then((resp) => {
             console.log(resp)
-            router.push({ name: 'filmRead', params: { id: resp._id } })
+            router.push({ name: 'sessionRead', params: { id: resp._id } })
         });
     });
 };
@@ -94,16 +107,16 @@ const updateForm = (e: any) => {
 function supprimer() {
     const optionRequest = User.getInstance().generateHeaders()
     optionRequest.method = 'DELETE'
-    fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest)
+    fetch(import.meta.env.VITE_API_URL + "sessions/" + id, optionRequest)
         .then(async (res) => {
             const json = await res.json()
-            if (res.ok) router.replace({ name: "filmIndex" })
+            if (res.ok) router.replace({ name: "sessionIndex" })
             else {
-                errorNotif("Impossible de supprimer le film")
-                router.replace({ name: "filmIndex" })
+                errorNotif("Impossible de supprimer le session")
+                router.replace({ name: "sessionIndex" })
             }
         })
-        .catch(() => (router.replace({ name: "filmIndex" })))
+        .catch(() => (router.replace({ name: "sessionIndex" })))
 }
 
 </script>
@@ -114,41 +127,35 @@ function supprimer() {
             <div class="card-content">
                 <div class="media">
                     <div class="media-content">
-                        <div style="text-align: center;">
-                            <img :src="data.poster_path" alt="Poster du film"
-                                style="max-height: 40vh; border-radius: 10px; ">
-                        </div>
-                        <o-field label="Titre">
-                            <o-input v-model="data.title" :readonly="isReadMode" />
+                        <o-field label="Horodatage">
+                            <o-input v-model="data.date" type="datetime-local" :readonly="isReadMode" />
                         </o-field>
                     </div>
                 </div>
 
                 <div class="content">
-                    <o-field label="Synopsis">
-                        <o-input v-model="data.overview" type="textarea" :readonly="isReadMode" />
-                    </o-field>
-                    <o-field label="Image" v-if="!isReadMode">
-                        <o-input v-model="data.poster_path" :readonly="isReadMode" />
-                    </o-field>
-                    <o-field label="Date de sortie">
-                        <o-input v-model="data.release_date" type="date" :readonly="isReadMode" />
-                    </o-field>
-
-
-                    <o-field label="Genres">
+                    <o-field label="Film">
                         <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag" v-for="genre in data.genres">{{ genre.title }}</span>
+                            <span class="tag">{{ data.film.title }}</span>
                         </div>
-                        <o-select v-else v-model="data.genres" multiple>
-                            <option v-for="genre in genres" :value="genre">{{ genre.title }}</option>
+                        <o-select v-else v-model="data.film">
+                            <option v-for="film in films" :value="film">{{ film.title }}</option>
+                        </o-select>
+                    </o-field>
+
+                    <o-field label="Cinéma">
+                        <div class="tags are-medium" v-if="isReadMode">
+                            <span class="tag">{{ data.cinema.name }}</span>
+                        </div>
+                        <o-select v-else v-model="data.cinema">
+                            <option v-for="cinema in cinemas" :value="cinema">{{ cinema.name }}</option>
                         </o-select>
                     </o-field>
                 </div>
             </div>
             <div class="card-footer">
                 <RouterLink class="card-footer-item button is-warning" v-if="isReadMode"
-                    :to="{ name: 'filmEdit', params: { id: id } }">
+                    :to="{ name: 'sessionEdit', params: { id: id } }">
                     <div class="">Modifier</div>
                 </RouterLink>
                 <div class="card-footer-item button is-primary" @click="updateForm" v-if="!isReadMode">Envoyer</div>

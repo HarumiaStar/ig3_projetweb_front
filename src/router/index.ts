@@ -54,6 +54,158 @@ const router = createRouter({
       ]
     },
     {
+      path: '/genres',
+      name: 'genresHome',
+      children: [
+        {
+          path: '',
+          name: 'genreIndex',
+          component: () => import('../views/genre/Index.vue')
+        },
+        {
+          path: 'create',
+          name: 'genreCreate',
+          component: () => import('../views/genre/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'create'
+          }
+        },
+        {
+          path: ':id',
+          name: 'genreRead',
+          component: () => import('../views/genre/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'read'
+          }
+        },
+        {
+          path: ':id/edit',
+          name: 'genreEdit',
+          component: () => import('../views/genre/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'edit'
+          }
+        }
+      ]
+    },
+    {
+      path: '/cinemas',
+      name: 'cinemasHome',
+      children: [
+        {
+          path: '',
+          name: 'cinemaIndex',
+          component: () => import('../views/cinema/Index.vue')
+        },
+        {
+          path: 'create',
+          name: 'cinemaCreate',
+          component: () => import('../views/cinema/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'create'
+          }
+        },
+        {
+          path: ':id',
+          name: 'cinemaRead',
+          component: () => import('../views/cinema/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'read'
+          }
+        },
+        {
+          path: ':id/edit',
+          name: 'cinemaEdit',
+          component: () => import('../views/cinema/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'edit'
+          }
+        }
+      ]
+    },
+    {
+      path: '/sessions',
+      name: 'sessionsHome',
+      children: [
+        {
+          path: '',
+          name: 'sessionIndex',
+          component: () => import('../views/session/Index.vue')
+        },
+        {
+          path: 'create',
+          name: 'sessionCreate',
+          component: () => import('../views/session/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'create'
+          }
+        },
+        {
+          path: ':id',
+          name: 'sessionRead',
+          component: () => import('../views/session/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'read'
+          }
+        },
+        {
+          path: ':id/edit',
+          name: 'sessionEdit',
+          component: () => import('../views/session/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'edit'
+          }
+        }
+      ]
+    },
+    {
+      path: '/bookings',
+      name: 'bookingsHome',
+      children: [
+        {
+          path: '',
+          name: 'bookingIndex',
+          component: () => import('../views/booking/Index.vue')
+        },
+        {
+          path: 'create',
+          name: 'bookingCreate',
+          component: () => import('../views/booking/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'create'
+          }
+        },
+        {
+          path: ':id',
+          name: 'bookingRead',
+          component: () => import('../views/booking/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'read'
+          }
+        },
+        {
+          path: ':id/edit',
+          name: 'bookingEdit',
+          component: () => import('../views/booking/Crud.vue'),
+          props: {
+            default: true,
+            mode: 'edit'
+          }
+        }
+      ]
+    },
+    {
       path: '/users',
       name: 'usersHome',
       children: [

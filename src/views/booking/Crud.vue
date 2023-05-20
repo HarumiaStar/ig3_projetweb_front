@@ -17,52 +17,65 @@ const route = useRoute()
 let id = route.params.id;
 
 const data = ref({
-    title: "",
-    overview: "",
-    poster_path: "",
-    release_date: "",
-    genres: [],
+    user: {},
+    session: {
+        film: {
+            title: ""
+        }
+    }
 });
 
 if (props.mode === 'read' || props.mode === 'edit') {
     if (id === "" || id === undefined) {
-        router.push({ name: 'filmIndex' })
+        router.push({ name: 'bookingIndex' })
     }
     else {
-        fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest).then((res) => {
+        fetch(import.meta.env.VITE_API_URL + "bookings/" + id, optionRequest).then((res) => {
             res.json().then((resp) => {
                 delete resp.__v
                 delete resp._id
+                delete resp.session.film.genres
 
-                data.value = {
-                    ...resp,
-                    release_date: resp.release_date.substring(0, 10)
-                }
+                data.value = resp
             });
         });
     }
 }
 
 
-const genres = ref([]);
+const sessions = ref([]);
+const users = ref([]);
 
-const fetchGenres = () => {
-    fetch(import.meta.env.VITE_API_URL + "genres", optionRequest).then((res) => {
+const fetchSessions = () => {
+    fetch(import.meta.env.VITE_API_URL + "sessions", optionRequest).then((res) => {
         res.json().then((resp) => {
-            genres.value = resp
+            sessions.value = resp
+            sessions.value.forEach((session: any) => {
+                delete session.film.genres
+            });
+        });
+    });
+};
+
+const fetchUsers = () => {
+    fetch(import.meta.env.VITE_API_URL + "users", optionRequest).then((res) => {
+        res.json().then((resp) => {
+            users.value = resp
         });
     });
 };
 
 if (props.mode !== 'read') {
-    fetchGenres()
+    fetchSessions()
+    fetchUsers()
 }
 
 watch(
     () => props.mode,
     () => {
         if (props.mode !== 'read') {
-            fetchGenres()
+            fetchSessions()
+            fetchUsers()
         }
     }
 );
@@ -76,7 +89,7 @@ const isReadMode = computed(() => props.mode === 'read');
 const updateForm = (e: any) => {
     e.preventDefault();
 
-    let url = import.meta.env.VITE_API_URL + "films";
+    let url = import.meta.env.VITE_API_URL + "bookings";
     if (props.mode !== 'create') url += "/" + id
 
     fetch(url, {
@@ -86,7 +99,7 @@ const updateForm = (e: any) => {
     }).then((res) => {
         res.json().then((resp) => {
             console.log(resp)
-            router.push({ name: 'filmRead', params: { id: resp._id } })
+            router.push({ name: 'bookingRead', params: { id: resp._id } })
         });
     });
 };
@@ -94,16 +107,16 @@ const updateForm = (e: any) => {
 function supprimer() {
     const optionRequest = User.getInstance().generateHeaders()
     optionRequest.method = 'DELETE'
-    fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest)
+    fetch(import.meta.env.VITE_API_URL + "bookings/" + id, optionRequest)
         .then(async (res) => {
             const json = await res.json()
-            if (res.ok) router.replace({ name: "filmIndex" })
+            if (res.ok) router.replace({ name: "bookingIndex" })
             else {
-                errorNotif("Impossible de supprimer le film")
-                router.replace({ name: "filmIndex" })
+                errorNotif("Impossible de supprimer le booking")
+                router.replace({ name: "bookingIndex" })
             }
         })
-        .catch(() => (router.replace({ name: "filmIndex" })))
+        .catch(() => (router.replace({ name: "bookingIndex" })))
 }
 
 </script>
@@ -112,43 +125,30 @@ function supprimer() {
     <div class="card">
         <form @submit="updateForm">
             <div class="card-content">
-                <div class="media">
-                    <div class="media-content">
-                        <div style="text-align: center;">
-                            <img :src="data.poster_path" alt="Poster du film"
-                                style="max-height: 40vh; border-radius: 10px; ">
-                        </div>
-                        <o-field label="Titre">
-                            <o-input v-model="data.title" :readonly="isReadMode" />
-                        </o-field>
-                    </div>
-                </div>
-
                 <div class="content">
-                    <o-field label="Synopsis">
-                        <o-input v-model="data.overview" type="textarea" :readonly="isReadMode" />
-                    </o-field>
-                    <o-field label="Image" v-if="!isReadMode">
-                        <o-input v-model="data.poster_path" :readonly="isReadMode" />
-                    </o-field>
-                    <o-field label="Date de sortie">
-                        <o-input v-model="data.release_date" type="date" :readonly="isReadMode" />
-                    </o-field>
-
-
-                    <o-field label="Genres">
+                    <o-field label="Utilisateur">
                         <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag" v-for="genre in data.genres">{{ genre.title }}</span>
+                            <span class="tag">{{ data.user.name +" "+ data.user.first_name }}</span>
                         </div>
-                        <o-select v-else v-model="data.genres" multiple>
-                            <option v-for="genre in genres" :value="genre">{{ genre.title }}</option>
+                        <o-select v-else v-model="data.user">
+                            <option v-for="user in users" :value="user">{{ user.name +" "+ user.first_name }}</option>
+                        </o-select>
+                    </o-field>
+
+
+                    <o-field label="Scéance">
+                        <div class="tags are-medium" v-if="isReadMode">
+                            <span class="tag">{{ new Date(data.session.date).toLocaleString() +" , "+ data.session.film.title }}</span>
+                        </div>
+                        <o-select v-else v-model="data.session">
+                            <option v-for="session in sessions" :value="session">{{ new Date(session.date).toLocaleString() +" , "+ session.film.title }}</option>
                         </o-select>
                     </o-field>
                 </div>
             </div>
             <div class="card-footer">
                 <RouterLink class="card-footer-item button is-warning" v-if="isReadMode"
-                    :to="{ name: 'filmEdit', params: { id: id } }">
+                    :to="{ name: 'bookingEdit', params: { id: id } }">
                     <div class="">Modifier</div>
                 </RouterLink>
                 <div class="card-footer-item button is-primary" @click="updateForm" v-if="!isReadMode">Envoyer</div>

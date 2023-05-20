@@ -54,6 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <RouterLink to="/films" class="navbar-item">
             Films
           </RouterLink>
+
+          <RouterLink to="/genres" class="navbar-item">
+            Genres
+          </RouterLink>
+
+          <RouterLink to="/cinemas" class="navbar-item">
+            Cinémas
+          </RouterLink>
+
+          <RouterLink to="/sessions" class="navbar-item">
+            Scéances
+          </RouterLink>
+          <RouterLink to="/bookings" class="navbar-item">
+            Réservations
+          </RouterLink>
         </div>
 
         <div class="navbar-end">
