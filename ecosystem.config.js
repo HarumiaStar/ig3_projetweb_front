@@ -14,6 +14,9 @@ module.exports = {
 					"stabilityThreshold": 30000,
 					"pollInterval": 1000
 				}
+			},
+			env: {
+				"VITE_API_URL": "https://suzanne-woa-api.rtinox.fr/"
 			}
 		}
 	]
