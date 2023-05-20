@@ -4,7 +4,7 @@ import { useRouter, useRoute } from "vue-router"
 import { User } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 const router = useRouter()
-const optionRequest = User.getInstance().generateHeaders()
+const optionRequest = User.generateHeaders()
 
 const props = defineProps({
     mode: {
@@ -105,14 +105,14 @@ const updateForm = (e: any) => {
 };
 
 function supprimer() {
-    const optionRequest = User.getInstance().generateHeaders()
+    const optionRequest = User.generateHeaders()
     optionRequest.method = 'DELETE'
     fetch(import.meta.env.VITE_API_URL + "bookings/" + id, optionRequest)
         .then(async (res) => {
             const json = await res.json()
             if (res.ok) router.replace({ name: "bookingIndex" })
             else {
-                errorNotif("Impossible de supprimer le booking")
+                errorNotif("Impossible de supprimer la réservation")
                 router.replace({ name: "bookingIndex" })
             }
         })

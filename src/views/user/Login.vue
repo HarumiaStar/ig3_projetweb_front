@@ -6,7 +6,7 @@ import { User } from '../../utils/user'
 const router = useRouter()
 
 const form = ref({
-    email: "n.a@test.fr",
+    email: "aaa@aaa.aaa",
     password: "aA!01234"
 })
 
@@ -22,8 +22,9 @@ function login(event: any){
     fetch(import.meta.env.VITE_API_URL + "users/login", requestOptions)
     .then(response => response.json())
     .then(data => {
-        const user = User.getInstance(data.token)
-        router.replace({ name: "userRead", params: { id: user.getData()._id}})
+        User.login(data.token)
+        location.replace("/users/"+User.getData()._id)
+        router.replace({ name: "userRead", params: { id: User.getData()._id}})
     });
 }
 </script>

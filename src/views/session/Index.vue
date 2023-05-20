@@ -8,7 +8,7 @@ const data = ref([])
 const router = useRouter()
 
 function getData() {
-  fetch(import.meta.env.VITE_API_URL + "sessions", User.getInstance().generateHeaders())
+  fetch(import.meta.env.VITE_API_URL + "sessions", User.generateHeaders())
     .then(async (res) => {
       const json = await res.json()
       if (res.ok) return json
@@ -21,7 +21,7 @@ function getData() {
 }
 
 function supprimer(id) {
-  const optionRequest = User.getInstance().generateHeaders()
+  const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
   console.log(id)
   fetch(import.meta.env.VITE_API_URL + "sessions/" + id, optionRequest)
@@ -42,34 +42,35 @@ getData() // On charge les données au chargement de la page
 
 <template>
   <h1>Les Scéances</h1>
-  <RouterLink :to="{ name: 'sessionCreate' }"><o-button variant="primary">➕ Ajouter un session</o-button></RouterLink>
+  <RouterLink :to="{ name: 'sessionCreate' }"><o-button variant="primary">➕ Ajouter une scéance</o-button></RouterLink>
 
   <o-table :data="data">
-    <o-table-column field="_id" label="ID" numeric v-slot:default="props">
-      <RouterLink :to="{ name: 'sessionRead', params: { id: props.row._id } }"> {{ props.row._id }} </RouterLink>
-    </o-table-column>
 
-    <o-table-column field="date" label="Horodatage" numeric v-slot:default="props">
+    <o-table-column field="date" label="Horodatage" sortable v-slot:default="props">
       {{ new Date(props.row.date).toLocaleString() }}
     </o-table-column>
 
-    <o-table-column field="film" label="Film" numeric v-slot:default="props">
+    <o-table-column field="film.title" label="Film" searchable sortable v-slot:default="props">
       {{ props.row.film.title }}
     </o-table-column>
 
-    <o-table-column field="cinema" label="Cinéma" numeric v-slot:default="props">
+    <o-table-column field="cinema.name" label="Cinéma" searchable sortable v-slot:default="props">
       {{ props.row.cinema.name }}
     </o-table-column>
 
-    <o-table-column field="created_at" label="Créé le :" numeric v-slot:default="props">
+    <o-table-column field="created_at" label="Créé le :" sortable v-slot:default="props">
       {{ new Date(props.row.created_at).toLocaleString() }}
     </o-table-column>
 
-    <o-table-column field="updated_at" label="Mise à jour le :" numeric v-slot:default="props">
+    <o-table-column field="updated_at" label="Mise à jour le :" sortable v-slot:default="props">
       {{ new Date(props.row.updated_at).toLocaleString() }}
     </o-table-column>
 
     <o-table-column field="action" label="Action" numeric v-slot:default="props">
+      <RouterLink :to="{name: 'sessionRead', params:{id: props.row._id}}" class="button is-info">
+        Voir
+      </RouterLink>
+
       <RouterLink :to="{ name: 'sessionEdit', params: { id: props.row._id } }" class="button is-warning">
         Editer
       </RouterLink>

@@ -4,7 +4,7 @@ import { useRouter, useRoute } from "vue-router"
 import { User } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 const router = useRouter()
-const optionRequest = User.getInstance().generateHeaders()
+const optionRequest = User.generateHeaders()
 
 const props = defineProps({
     mode: {
@@ -105,7 +105,7 @@ const updateForm = (e: any) => {
 };
 
 function supprimer() {
-    const optionRequest = User.getInstance().generateHeaders()
+    const optionRequest = User.generateHeaders()
     optionRequest.method = 'DELETE'
     fetch(import.meta.env.VITE_API_URL + "sessions/" + id, optionRequest)
         .then(async (res) => {
@@ -136,7 +136,7 @@ function supprimer() {
                 <div class="content">
                     <o-field label="Film">
                         <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag">{{ data.film.title }}</span>
+                            <o-input v-model="data.film.title" :readonly="isReadMode" />
                         </div>
                         <o-select v-else v-model="data.film">
                             <option v-for="film in films" :value="film">{{ film.title }}</option>
@@ -145,7 +145,7 @@ function supprimer() {
 
                     <o-field label="Cinéma">
                         <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag">{{ data.cinema.name }}</span>
+                            <o-input v-model="data.cinema.name" :readonly="isReadMode" />
                         </div>
                         <o-select v-else v-model="data.cinema">
                             <option v-for="cinema in cinemas" :value="cinema">{{ cinema.name }}</option>

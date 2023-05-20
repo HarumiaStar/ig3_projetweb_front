@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import router from './router';
+import { User } from './utils/user'
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -13,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Get the target from the "data-target" attribute
       const target = el.dataset.target;
-      const $target = document.getElementById(target);
+      const $target :any = document.getElementById(target);
 
       // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
       el.classList.toggle('is-active');
@@ -23,6 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
+
+function logout(){
+  User.logout()
+  router.replace({name: "userLogin"})
+  location.reload()
+}
+
+const isAuthenticated = computed(() => User.isAuthenticated)
 </script>
 
 <template>
@@ -74,12 +85,20 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <RouterLink to="/users/register" class="button is-primary">
-                Inscription
-              </RouterLink>
-              <RouterLink to="/users/login" class="button is-info">
-                Connexion
-              </RouterLink>
+              <div class="tag is-info is-light" v-if="!isAuthenticated">
+                <RouterLink to="/users/register" class="button is-primary">
+                  Inscription
+                </RouterLink>
+                <RouterLink to="/users/login" class="button is-info">
+                  Connexion
+                </RouterLink>
+              </div>
+              <div v-else>
+                <RouterLink :to="{name: 'userRead', params:{id: User.getData()._id}}" class="button is-primary">
+                  Profil
+                </RouterLink>
+                <o-button variant="danger" @click="logout()">Déconnexion</o-button>
+              </div>
             </div>
           </div>
         </div>

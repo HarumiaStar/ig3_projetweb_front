@@ -10,7 +10,7 @@ const id = route.params.id
 
 const data = ref();
 
-fetch(import.meta.env.VITE_API_URL + "users/" + id, User.getInstance().generateHeaders())
+fetch(import.meta.env.VITE_API_URL + "users/" + id, User.generateHeaders())
 .then(async (res) => {
   const json = await res.json()
   if (res.ok) return json
@@ -22,7 +22,7 @@ fetch(import.meta.env.VITE_API_URL + "users/" + id, User.getInstance().generateH
 .then(json => (data.value = json))
 
 function supprimer(){
-  const optionRequest = User.getInstance().generateHeaders()
+  const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
   fetch(import.meta.env.VITE_API_URL + "users/" + id, optionRequest)
   .then(async (res) => {
@@ -63,7 +63,7 @@ function supprimer(){
             </div>
           </div>
           <div class="card-footer">
-            <div class="card-footer-item button is-warning"><RouterLink :to="{name: 'userEdit', params:{id: data._id}}">Modifier</RouterLink></div>
+            <RouterLink class="card-footer-item button is-warning" :to="{name: 'userEdit', params:{id: data._id}}">Modifier</RouterLink>
             <div class="card-footer-item button is-danger" @click="supprimer">Supprimer</div>
           </div>
         </div>

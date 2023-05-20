@@ -18,7 +18,7 @@ const form = ref({
     newPassword: undefined
 })
 
-fetch(import.meta.env.VITE_API_URL + "users/" + id, User.getInstance().generateHeaders())
+fetch(import.meta.env.VITE_API_URL + "users/" + id, User.generateHeaders())
 .then(async response => {
     const res = await response.json();
     if (response.ok) return res
@@ -37,12 +37,11 @@ fetch(import.meta.env.VITE_API_URL + "users/" + id, User.getInstance().generateH
 
 function updateForm(event: any){
     event.preventDefault()
-    const user = User.getInstance()
 
     const requestOptions = {
         method: "PUT",
         headers: {
-            "Authorization": "Bearer " + user.getToken(),
+            "Authorization": "Bearer " + User.getToken(),
             "Content-Type": "application/json",
         },
         body: JSON.stringify(form.value)
@@ -53,8 +52,8 @@ function updateForm(event: any){
         console.log(response)
         const json = await response.json()
         if (response.ok) {
-            if (json._id === user.getData()._id){
-                User.clearStorage()
+            if (json._id === User.getData()._id){
+                User.logout()
                 router.replace({name: "userLogin"})
             }
             else router.replace({name: "userRead"})

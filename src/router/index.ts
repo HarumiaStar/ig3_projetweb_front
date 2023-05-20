@@ -238,7 +238,7 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   if (
     // make sure the user is authenticated
-    !User.isAuthenticated() &&
+    !User.isAuthenticated &&
     // ❗️ Avoid an infinite redirect
     to.name !== 'userLogin' && to.name !== 'userCreate' && to.name !== 'home'
     ) {

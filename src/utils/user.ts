@@ -1,51 +1,46 @@
-export class User {
-    readonly data: any
-    readonly token: string
+export const User = {
+    data : undefined,
+    token : "",
+    isAuthenticated : false,
 
-    private static _instance: User
-
-    private constructor(token: string) {
+    login(token: string) {
         this.token = token
         this.data = parseJwt(token)
+        this.isAuthenticated = true
         localStorage.setItem("token", this.token)
         localStorage.setItem("user", JSON.stringify(this.data))
-    }
+    },
 
-    public static getInstance(token = "") : User{
-        return this._instance || (this._instance = new this(token))
-    }
-
-    public static loadFromStorage() {
+    loadFromStorage() {
         const lStoken = localStorage.getItem("token")
         if (lStoken){
-            this._instance = new this(lStoken)
+            this.login(lStoken)
         }
         else{
             console.log("Pas de token dans le localStorage")
         }
-    }
+    },
 
-    public getData() : any {return this.data}
+    getData() : any {return this.data},
     
-    public getToken() : string {return this.token}
+    getToken() : string {return this.token},
     
-    public generateHeaders(): any {
+    generateHeaders(): any {
         return {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + this.token
             }
         }
-    }
+    },
     
-    public static isAuthenticated() : boolean  {
-        return this._instance !== undefined && User._instance.getToken() !== undefined && this._instance.data && this._instance.data.exp > Date.now()/1000
-    }
-    
-    public static clearStorage(){
+    logout(){
+        this.data = undefined
+        this.token = ""
+        this.isAuthenticated = false
         localStorage.removeItem("token")
         localStorage.removeItem("user")
-    }
+    },
     
 }
 
@@ -58,3 +53,5 @@ function parseJwt (token: string) {
 
     return JSON.parse(jsonPayload);
 }
+
+export default User

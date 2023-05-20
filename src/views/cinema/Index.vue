@@ -8,7 +8,7 @@ const data = ref([])
 const router = useRouter()
 
 function getData() {
-  fetch(import.meta.env.VITE_API_URL + "cinemas", User.getInstance().generateHeaders())
+  fetch(import.meta.env.VITE_API_URL + "cinemas", User.generateHeaders())
     .then(async (res) => {
       const json = await res.json()
       if (res.ok) return json
@@ -21,7 +21,7 @@ function getData() {
 }
 
 function supprimer(id) {
-  const optionRequest = User.getInstance().generateHeaders()
+  const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
   console.log(id)
   fetch(import.meta.env.VITE_API_URL + "cinemas/" + id, optionRequest)
@@ -45,40 +45,41 @@ getData() // On charge les données au chargement de la page
   <RouterLink :to="{ name: 'cinemaCreate' }"><o-button variant="primary">➕ Ajouter un cinema</o-button></RouterLink>
 
   <o-table :data="data">
-    <o-table-column field="_id" label="ID" numeric v-slot:default="props">
-      <RouterLink :to="{ name: 'cinemaRead', params: { id: props.row._id } }"> {{ props.row._id }} </RouterLink>
-    </o-table-column>
 
-    <o-table-column field="name" label="Nom" numeric v-slot:default="props">
+    <o-table-column field="name" label="Nom" searchable sortable v-slot:default="props">
       {{ props.row.name }}
     </o-table-column>
 
-    <o-table-column field="adress" label="Adresse" numeric v-slot:default="props">
+    <o-table-column field="adress" label="Adresse" searchable sortable v-slot:default="props">
       {{ props.row.adress }}
     </o-table-column>
 
-    <o-table-column field="postal_code" label="Code Postal" numeric v-slot:default="props">
+    <o-table-column field="postal_code" label="Code Postal" searchable sortable v-slot:default="props">
       {{ props.row.postal_code }}
     </o-table-column>
 
-    <o-table-column field="city" label="Ville" numeric v-slot:default="props">
+    <o-table-column field="city" label="Ville" searchable sortable v-slot:default="props">
       {{ props.row.city }}
     </o-table-column>
 
-    <o-table-column field="country" label="Pays" numeric v-slot:default="props">
+    <o-table-column field="country" label="Pays" searchable sortable v-slot:default="props">
       {{ props.row.country }}
     </o-table-column>
 
 
-    <o-table-column field="created_at" label="Créé le :" numeric v-slot:default="props">
+    <o-table-column field="created_at" label="Créé le :" v-slot:default="props">
       {{ new Date(props.row.created_at).toLocaleString() }}
     </o-table-column>
 
-    <o-table-column field="updated_at" label="Mise à jour le :" numeric v-slot:default="props">
+    <o-table-column field="updated_at" label="Mise à jour le :" v-slot:default="props">
       {{ new Date(props.row.updated_at).toLocaleString() }}
     </o-table-column>
 
     <o-table-column field="action" label="Action" numeric v-slot:default="props">
+      <RouterLink :to="{name: 'cinemaRead', params:{id: props.row._id}}" class="button is-info">
+        Voir
+      </RouterLink>
+
       <RouterLink :to="{ name: 'cinemaEdit', params: { id: props.row._id } }" class="button is-warning">
         Editer
       </RouterLink>
