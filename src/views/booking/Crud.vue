@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAdministrator, isAboutMe } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 const router = useRouter()
 const optionRequest = User.generateHeaders()
+const isAdmin = isAdministrator()
 
 const props = defineProps({
     mode: {
@@ -32,6 +33,10 @@ if (props.mode === 'read' || props.mode === 'edit') {
     else {
         fetch(import.meta.env.VITE_API_URL + "bookings/" + id, optionRequest).then((res) => {
             res.json().then((resp) => {
+                if(props.mode === 'edit' && (!isAboutMe(resp.user._id) && !isAdmin)) {
+                    errorNotif("Vous n'avez pas les droits pour modifier cette réservation")
+                    router.push({ name: 'bookingIndex' })
+                }
                 delete resp.__v
                 delete resp._id
                 delete resp.session.film.genres
@@ -61,6 +66,9 @@ const fetchUsers = () => {
     fetch(import.meta.env.VITE_API_URL + "users", optionRequest).then((res) => {
         res.json().then((resp) => {
             users.value = resp
+            if (props.mode === 'create') {
+                data.value.user = users.value.find((user: any) => user._id === User.getData()._id)
+            }
         });
     });
 };
@@ -98,7 +106,6 @@ const updateForm = (e: any) => {
         body: JSON.stringify(data.value),
     }).then((res) => {
         res.json().then((resp) => {
-            console.log(resp)
             router.push({ name: 'bookingRead', params: { id: resp._id } })
         });
     });
@@ -127,12 +134,12 @@ function supprimer() {
             <div class="card-content">
                 <div class="content">
                     <o-field label="Utilisateur">
-                        <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag">{{ data.user.name +" "+ data.user.first_name }}</span>
-                        </div>
-                        <o-select v-else v-model="data.user">
+                        <o-select v-if="isAdmin && !isReadMode" v-model="data.user">
                             <option v-for="user in users" :value="user">{{ user.name +" "+ user.first_name }}</option>
                         </o-select>
+                        <div class="tags are-medium" v-else>
+                            <span class="tag">{{ data.user.name +" "+ data.user.first_name }}</span>
+                        </div>
                     </o-field>
 
 
@@ -147,12 +154,12 @@ function supprimer() {
                 </div>
             </div>
             <div class="card-footer">
-                <RouterLink class="card-footer-item button is-warning" v-if="isReadMode"
+                <RouterLink class="card-footer-item button is-warning" v-if="isReadMode && (isAdmin || isAboutMe(data.user._id))"
                     :to="{ name: 'bookingEdit', params: { id: id } }">
                     <div class="">Modifier</div>
                 </RouterLink>
-                <div class="card-footer-item button is-primary" @click="updateForm" v-if="!isReadMode">Envoyer</div>
-                <div class="card-footer-item button is-danger" @click="supprimer">Supprimer</div>
+                <div  class="card-footer-item button is-primary" @click="updateForm" v-if="!isReadMode && (isAdmin || isAboutMe(data.user._id))">Envoyer</div>
+                <div  v-if="isAdmin || isAboutMe(data.user._id)" class="card-footer-item button is-danger" @click="supprimer">Supprimer</div>
             </div>
         </form>
     </div>

@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAboutMe } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id
+
+if (id === "" || id === undefined) {
+    router.replace({name: "userIndex"})
+}
+
+if (!isAboutMe(id)){
+  errorNotif("Vous n'avez pas les droits pour accéder à cette page")
+  router.replace({name: "userIndex"})
+}
 
 const form = ref({
     name: undefined,
@@ -49,8 +58,8 @@ function updateForm(event: any){
 
     fetch(import.meta.env.VITE_API_URL + "users/" + id, requestOptions)
     .then(async response => {
-        console.log(response)
         const json = await response.json()
+        console.log(json)
         if (response.ok) {
             if (json._id === User.getData()._id){
                 User.logout()

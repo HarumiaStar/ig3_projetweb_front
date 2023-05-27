@@ -1,27 +1,48 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAboutMe, isAdministrator } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 
 const route = useRoute()
 const router = useRouter()
-const id = route.params.id
+let id = route.params.id
+
+watch(
+  () => route.params.id, 
+  (newValue) => {
+    id = newValue
+    fetchUser()
+  }
+);
 
 const data = ref();
 
-fetch(import.meta.env.VITE_API_URL + "users/" + id, User.generateHeaders())
-.then(async (res) => {
-  const json = await res.json()
-  if (res.ok) return json
-    else {
-      errorNotif("Token d'acces non valide ou innexistant")
-      router.replace({name: "userLogin"})
-    }
-})
-.then(json => (data.value = json))
+function fetchUser(){
+  if (id === "" || id === undefined) {
+    router.replace({name: "userIndex"})
+    return
+  }
+  fetch(import.meta.env.VITE_API_URL + "users/" + id, User.generateHeaders())
+  .then(async (res) => {
+    const json = await res.json()
+    if (res.ok) return json
+      else {
+        errorNotif("Token d'acces non valide ou innexistant")
+        router.replace({name: "userLogin"})
+      }
+  })
+  .then(json => (data.value = json))
+}
+
+fetchUser()
 
 function supprimer(){
+  if (!isAboutMe(id) && !isAdministrator()){
+    errorNotif("Vous n'avez pas les droits pour supprimer ce compte.")
+    router.replace({name: "userIndex"})
+    return
+  }
   const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
   fetch(import.meta.env.VITE_API_URL + "users/" + id, optionRequest)
@@ -62,7 +83,7 @@ function supprimer(){
               <time datetime="2016-1-1">Compte créé le : {{ new Date(data.created_at).toLocaleString() }} ; Compte mis à jour le : {{ new Date(data.updated_at).toLocaleString() }}</time>
             </div>
           </div>
-          <div class="card-footer">
+          <div class="card-footer" v-if="isAboutMe(id) || isAdministrator()">
             <RouterLink class="card-footer-item button is-warning" :to="{name: 'userEdit', params:{id: data._id}}">Modifier</RouterLink>
             <div class="card-footer-item button is-danger" @click="supprimer">Supprimer</div>
           </div>

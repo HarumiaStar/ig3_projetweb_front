@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from "vue-router"
 import { errorNotif } from '../../utils/notification'
-import { User } from '../../utils/user'
+import { User, isAboutMe, isAdministrator } from '../../utils/user'
 
 const data = ref([])
 const router = useRouter()
@@ -42,7 +42,7 @@ getData() // On charge les données au chargement de la page
 
 <template>
   <h1>Les Réservations</h1>
-  <RouterLink :to="{ name: 'bookingCreate' }"><o-button variant="primary">➕ Ajouter une réservation</o-button></RouterLink>
+  <RouterLink :to="{ name: 'bookingCreate' }" ><o-button variant="primary">➕ Ajouter une réservation</o-button></RouterLink>
 
   <o-table :data="data">
 
@@ -75,11 +75,11 @@ getData() // On charge les données au chargement de la page
         Voir
       </RouterLink>
 
-      <RouterLink :to="{ name: 'bookingEdit', params: { id: props.row._id } }" class="button is-warning">
+      <RouterLink  v-if="isAdministrator() || isAboutMe(props.row.user._id)" :to="{ name: 'bookingEdit', params: { id: props.row._id } }" class="button is-warning">
         Editer
       </RouterLink>
 
-      <div class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
+      <div  v-if="isAdministrator() || isAboutMe(props.row.user._id)" class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
     </o-table-column>
 
   </o-table>

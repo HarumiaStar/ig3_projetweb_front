@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAboutMe, isAdministrator } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 
 const data = ref([])
@@ -15,9 +15,13 @@ function getData(){
 }
 
 function supprimer(id){
+  if (!isAboutMe(id) && !isAdministrator()){
+    errorNotif("Vous n'avez pas les droits pour supprimer ce compte.")
+    router.replace({name: "userIndex"})
+    return
+  }
   const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
-  console.log(id)
   fetch(import.meta.env.VITE_API_URL + "users/" + id, optionRequest)
   .then(async (res)=> {
     const json = await res.json()
@@ -76,11 +80,11 @@ getData()
                   Voir
           </RouterLink>
           
-          <RouterLink :to="{name: 'userEdit', params:{id: props.row._id}}" class="button is-warning">
+          <RouterLink v-if="isAboutMe(props.row._id) || isAdministrator()" :to="{name: 'userEdit', params:{id: props.row._id}}" class="button is-warning">
                   Editer
           </RouterLink>
 
-          <div class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
+          <div v-if="isAboutMe(props.row._id) || isAdministrator()" class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
         </o-table-column>
    
     </o-table>
