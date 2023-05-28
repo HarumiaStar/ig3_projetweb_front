@@ -52,15 +52,15 @@ getData() // On charge les données au chargement de la page
   <o-table :data="data">
 
     <o-table-column field="date" label="Horodatage" sortable v-slot:default="props">
-      {{ new Date(props.row.date).toLocaleString() }}
+      {{ new Date(props.row.date).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}) }}
     </o-table-column>
 
     <o-table-column field="film.title" label="Film" searchable sortable v-slot:default="props">
-      {{ props.row.film.title }}
+      <RouterLink :to="{name: 'filmRead', params:{id: props.row.film._id}}"> {{ props.row.film.title }} </RouterLink>
     </o-table-column>
 
     <o-table-column field="cinema.name" label="Cinéma" searchable sortable v-slot:default="props">
-      {{ props.row.cinema.name }}
+      <RouterLink :to="{name: 'cinemaRead', params:{id: props.row.cinema._id}}"> {{ props.row.cinema.name }} </RouterLink>
     </o-table-column>
 
     <o-table-column field="created_at" label="Créé le :" sortable v-slot:default="props">

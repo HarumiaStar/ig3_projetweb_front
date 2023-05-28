@@ -20,10 +20,14 @@ function getData() {
     .then(json => (data.value = json))
 }
 
-function supprimer(id) {
+function supprimer(id, user_id) {
+  if (!isAdministrator() && !isAboutMe(user_id)) {
+    errorNotif("Vous n'avez pas les droits pour supprimer cette réservation.")
+    router.replace({ name: "bookingIndex" })
+    return
+  }
   const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
-  console.log(id)
   fetch(import.meta.env.VITE_API_URL + "bookings/" + id, optionRequest)
     .then(async (res) => {
       const json = await res.json()
@@ -45,21 +49,20 @@ getData() // On charge les données au chargement de la page
   <RouterLink :to="{ name: 'bookingCreate' }" ><o-button variant="primary">➕ Ajouter une réservation</o-button></RouterLink>
 
   <o-table :data="data">
-
-    <o-table-column searchable sortable field="user.name" label="Nom" v-slot:default="props">
-      {{ props.row.user.name }}
+    <o-table-column sortable field="session.date" label="Horodatage" v-slot:default="props">
+      {{ new Date(props.row.session.date).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'})}}
     </o-table-column>
 
-    <o-table-column searchable sortable field="user.first_name" label="Prénom" v-slot:default="props">
-      {{ props.row.user.first_name }}
-    </o-table-column>
-
-    <o-table-column searchable sortable field="session.date" label="Horodatage" v-slot:default="props">
-      {{ new Date(props.row.session.date).toLocaleString()}}
+    <o-table-column searchable sortable field="user.name user.first_name" label="Utilisateur" v-slot:default="props">
+      <RouterLink :to="{name: 'userRead', params:{id: props.row.user._id}}"> {{ props.row.user.name + " " + props.row.user.first_name }} </RouterLink>
     </o-table-column>
 
     <o-table-column searchable sortable field="session.film.title" label="Film" v-slot:default="props">
-      {{ props.row.session.film.title }}
+      <RouterLink :to="{name: 'filmRead', params:{id: props.row.session.film._id}}"> {{ props.row.session.film.title }} </RouterLink>
+    </o-table-column>
+
+    <o-table-column searchable sortable field="session.cinema.name" label="Cinéma" v-slot:default="props">
+      <RouterLink :to="{name: 'cinemaRead', params:{id: props.row.session.cinema._id}}"> {{ props.row.session.cinema.name }} </RouterLink>
     </o-table-column>
 
     <o-table-column sortable field="created_at" label="Créé le :" v-slot:default="props">
@@ -79,7 +82,7 @@ getData() // On charge les données au chargement de la page
         Editer
       </RouterLink>
 
-      <div  v-if="isAdministrator() || isAboutMe(props.row.user._id)" class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
+      <div  v-if="isAdministrator() || isAboutMe(props.row.user._id)" class="button is-danger" @click="supprimer(props.row._id, props.row.user._id)">Supprimer</div>
     </o-table-column>
 
   </o-table>

@@ -22,7 +22,10 @@ const data = ref({
     session: {
         film: {
             title: ""
-        }
+        },
+        cinema: {
+            name: ""
+        },
     }
 });
 
@@ -145,10 +148,10 @@ function supprimer() {
 
                     <o-field label="Séance">
                         <div class="tags are-medium" v-if="isReadMode">
-                            <span class="tag">{{ new Date(data.session.date).toLocaleString() +" , "+ data.session.film.title }}</span>
+                            <span class="tag">{{ new Date(data.session.date).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}) +" , "+ data.session.film.title }}</span>
                         </div>
                         <o-select v-else v-model="data.session">
-                            <option v-for="session in sessions" :value="session">{{ new Date(session.date).toLocaleString() +" , "+ session.film.title }}</option>
+                            <option v-for="session in sessions" :value="session">{{ new Date(session.date).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}) +" , "+ session.film.title }}</option>
                         </o-select>
                     </o-field>
                 </div>

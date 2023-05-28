@@ -28,7 +28,6 @@ function supprimer(id) {
   }
   const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
-  console.log(id)
   fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest)
     .then(async (res) => {
       const json = await res.json()
@@ -61,7 +60,7 @@ getData() // On charge les données au chargement de la page
 
     <o-table-column field="genres" label="Genres" sortable v-slot:default="props">
       <div class="tags are-medium">
-        <span class="tag" v-for="genre in props.row.genres">{{ genre.title }}</span>
+        <span class="tag" v-for="genre in props.row.genres"><RouterLink :to="{name: 'genreRead', params:{id: genre._id}}">{{ genre.title }} </RouterLink></span>
       </div>
     </o-table-column>
 
