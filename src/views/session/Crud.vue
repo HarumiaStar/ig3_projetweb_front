@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAdministrator } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 const router = useRouter()
 const optionRequest = User.generateHeaders()
@@ -21,6 +21,11 @@ const data = ref({
     film: "",
     cinema: "",
 });
+
+if (!isAdministrator() && props.mode !== 'read') {
+    errorNotif("Vous n'avez pas les droits pour faire cette action.")
+    router.replace({ name: "sessionIndex" })
+}
 
 if (props.mode === 'read' || props.mode === 'edit') {
     if (id === "" || id === undefined) {
@@ -87,6 +92,11 @@ watch(() => route.params.id, (newValue) => {
 const isReadMode = computed(() => props.mode === 'read');
 
 const updateForm = (e: any) => {
+    if (!isAdministrator()) {
+        errorNotif("Vous n'avez pas les droits pour modifier cette séance.")
+        router.replace({ name: "sessionIndex" })
+        return
+    }
     e.preventDefault();
 
     let url = import.meta.env.VITE_API_URL + "sessions";
@@ -105,6 +115,11 @@ const updateForm = (e: any) => {
 };
 
 function supprimer() {
+    if (!isAdministrator()) {
+        errorNotif("Vous n'avez pas les droits pour supprimer cette séance.")
+        router.replace({ name: "sessionIndex" })
+        return
+    }
     const optionRequest = User.generateHeaders()
     optionRequest.method = 'DELETE'
     fetch(import.meta.env.VITE_API_URL + "sessions/" + id, optionRequest)
@@ -112,7 +127,7 @@ function supprimer() {
             const json = await res.json()
             if (res.ok) router.replace({ name: "sessionIndex" })
             else {
-                errorNotif("Impossible de supprimer le session")
+                errorNotif("Impossible de supprimer la séance.")
                 router.replace({ name: "sessionIndex" })
             }
         })
@@ -153,7 +168,7 @@ function supprimer() {
                     </o-field>
                 </div>
             </div>
-            <div class="card-footer">
+            <div v-if="isAdministrator()" class="card-footer">
                 <RouterLink class="card-footer-item button is-warning" v-if="isReadMode"
                     :to="{ name: 'sessionEdit', params: { id: id } }">
                     <div class="">Modifier</div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User } from '../../utils/user'
+import { User, isAdministrator } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 const router = useRouter()
 const optionRequest = User.generateHeaders()
@@ -23,6 +23,11 @@ const data = ref({
     release_date: "",
     genres: [],
 });
+
+if (!isAdministrator() && props.mode !== 'read') {
+    errorNotif("Vous n'avez pas les droits pour faire cette action.")
+    router.replace({ name: "filmIndex" })
+}
 
 if (props.mode === 'read' || props.mode === 'edit') {
     if (id === "" || id === undefined) {
@@ -74,6 +79,11 @@ watch(() => route.params.id, (newValue) => {
 const isReadMode = computed(() => props.mode === 'read');
 
 const updateForm = (e: any) => {
+    if (!isAdministrator()) {
+        errorNotif("Vous n'avez pas les droits pour modifier ce film.")
+        router.replace({ name: "filmIndex" })
+        return
+    }
     e.preventDefault();
 
     let url = import.meta.env.VITE_API_URL + "films";
@@ -92,6 +102,11 @@ const updateForm = (e: any) => {
 };
 
 function supprimer() {
+    if (!isAdministrator()) {
+        errorNotif("Vous n'avez pas les droits pour supprimer ce film.")
+        router.replace({ name: "filmIndex" })
+        return
+    }
     const optionRequest = User.generateHeaders()
     optionRequest.method = 'DELETE'
     fetch(import.meta.env.VITE_API_URL + "films/" + id, optionRequest)
@@ -146,7 +161,7 @@ function supprimer() {
                     </o-field>
                 </div>
             </div>
-            <div class="card-footer">
+            <div v-if="isAdministrator()" class="card-footer">
                 <RouterLink class="card-footer-item button is-warning" v-if="isReadMode"
                     :to="{ name: 'filmEdit', params: { id: id } }">
                     <div class="">Modifier</div>

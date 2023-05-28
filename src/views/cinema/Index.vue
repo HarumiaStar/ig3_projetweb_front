@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from "vue-router"
 import { errorNotif } from '../../utils/notification'
-import { User } from '../../utils/user'
+import { User, isAdministrator } from '../../utils/user'
 
 const data = ref([])
 const router = useRouter()
@@ -21,6 +21,11 @@ function getData() {
 }
 
 function supprimer(id) {
+  if (!isAdministrator()) {
+    errorNotif("Vous n'avez pas les droits pour supprimer ce cinema.")
+    router.replace({ name: "cinemaIndex" })
+    return
+  }
   const optionRequest = User.generateHeaders()
   optionRequest.method = 'DELETE'
   console.log(id)
@@ -42,7 +47,7 @@ getData() // On charge les données au chargement de la page
 
 <template>
   <h1>Les Cinémas</h1>
-  <RouterLink :to="{ name: 'cinemaCreate' }"><o-button variant="primary">➕ Ajouter un cinema</o-button></RouterLink>
+  <RouterLink v-if="isAdministrator()" :to="{ name: 'cinemaCreate' }"><o-button variant="primary">➕ Ajouter un cinema</o-button></RouterLink>
 
   <o-table :data="data">
 
@@ -80,11 +85,11 @@ getData() // On charge les données au chargement de la page
         Voir
       </RouterLink>
 
-      <RouterLink :to="{ name: 'cinemaEdit', params: { id: props.row._id } }" class="button is-warning">
+      <RouterLink v-if="isAdministrator()" :to="{ name: 'cinemaEdit', params: { id: props.row._id } }" class="button is-warning">
         Editer
       </RouterLink>
 
-      <div class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
+      <div v-if="isAdministrator()" class="button is-danger" @click="supprimer(props.row._id)">Supprimer</div>
     </o-table-column>
 
   </o-table>

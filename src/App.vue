@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import router from './router';
 import { User } from './utils/user'
 
@@ -38,11 +37,6 @@ const isAuthenticated = computed(() => User.isAuthenticated)
 
 <template>
   <header>
-    <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-    </nav>
-
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <RouterLink class="navbar-item" to="/">
@@ -75,7 +69,7 @@ const isAuthenticated = computed(() => User.isAuthenticated)
           </RouterLink>
 
           <RouterLink to="/sessions" class="navbar-item">
-            Scéances
+            Séances
           </RouterLink>
           <RouterLink to="/bookings" class="navbar-item">
             Réservations
@@ -111,6 +105,6 @@ const isAuthenticated = computed(() => User.isAuthenticated)
   </div>
 
   <footer>
-    <p>Author: Suzanne R.</p>
+    <p class="has-text-centered">Auteur: Suzanne R.</p>
   </footer>
 </template>

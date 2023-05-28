@@ -143,7 +143,7 @@ function supprimer() {
                     </o-field>
 
 
-                    <o-field label="Scéance">
+                    <o-field label="Séance">
                         <div class="tags are-medium" v-if="isReadMode">
                             <span class="tag">{{ new Date(data.session.date).toLocaleString() +" , "+ data.session.film.title }}</span>
                         </div>
