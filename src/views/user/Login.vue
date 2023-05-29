@@ -6,8 +6,8 @@ import { User } from '../../utils/user'
 const router = useRouter()
 
 const form = ref({
-    email: "aaa@aaa.aaa",
-    password: "aA!01234"
+    email: "",
+    password: ""
 })
 
 function login(event: any){
@@ -56,5 +56,6 @@ function login(event: any){
         </span>
     </form>
 
+    <RouterLink :to="{ name: 'userReset' }" class="button is-warning">Mot de passe oublié ?</RouterLink>
 
 </template>

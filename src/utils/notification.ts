@@ -10,3 +10,12 @@ export function errorNotif(message : string){
         variant: 'danger'
     })
 }
+
+export function infoNotif(message : string){
+    return oruga.notification.open({
+        duration: 5000,
+        message: `<b>${message}</b>`,
+        position: 'bottom-right',
+        variant: 'info'
+    })
+}

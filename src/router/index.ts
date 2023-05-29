@@ -11,6 +11,22 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/reset-password',
+      name: 'resetHome',
+      children: [
+        {
+          path: '',
+          name: 'userReset',
+          component: () => import('../views/user/Reset.vue')
+        },
+        {
+          path: ':token',
+          name: 'userResetToken',
+          component: () => import('../views/user/ResetToken.vue')
+        }
+      ]
+    },
+    {
       path: '/films',
       name: 'filmsHome',
       children: [
@@ -235,7 +251,7 @@ router.beforeEach(async (to, from) => {
     // make sure the user is authenticated
     !User.isAuthenticated &&
     // ❗️ Avoid an infinite redirect
-    to.name !== 'userLogin' && to.name !== 'userCreate' && to.name !== 'home'
+    to.name !== 'userLogin' && to.name !== 'userCreate' && to.name !== 'home' && to.name !== 'userReset' && to.name !== 'userResetToken'
     ) {
     // redirect the user to the login page
     return { name: 'userLogin' }
