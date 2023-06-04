@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter, useRoute } from "vue-router"
-import { User, isAboutMe } from '../../utils/user'
+import { User, isAboutMe, isAdministrator } from '../../utils/user'
 import { errorNotif } from '../../utils/notification'
 
 const route = useRoute()
@@ -12,7 +12,7 @@ if (id === "" || id === undefined) {
     router.replace({name: "userIndex"})
 }
 
-if (!isAboutMe(id)){
+if (!isAdministrator() && !isAboutMe(id)){
   errorNotif("Vous n'avez pas les droits pour accéder à cette page")
   router.replace({name: "userIndex"})
 }
@@ -24,7 +24,8 @@ const form = ref({
     birthday: undefined,
     city: undefined,
     password: undefined,
-    newPassword: undefined
+    newPassword: undefined,
+    is_admin: undefined
 })
 
 fetch(import.meta.env.VITE_API_URL + "users/" + id, User.generateHeaders())
@@ -109,6 +110,10 @@ function updateForm(event: any){
             </template>
           <o-input  v-model="form.newPassword" type="password" placeholder="***************" password-reveal></o-input>
         </o-field>
+
+        <o-field v-if="isAdministrator()" label="Administrateur">
+          <o-checkbox v-model="form.is_admin">{{ form.is_admin ? "Oui" : "Non"}} </o-checkbox>
+        </o-field> 
 
         <o-button nativeType="submit" variant="success">Enregistrer</o-button>
     </form>

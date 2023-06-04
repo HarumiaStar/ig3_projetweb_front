@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from "vue-router"
 import { User } from '../../utils/user'
-import { infoNotif } from '../../utils/notification'
+import { errorNotif, infoNotif } from '../../utils/notification'
 const router = useRouter()
 const route = useRoute()
 
@@ -23,10 +23,16 @@ function changePassword(event: any){
     }
 
     fetch(import.meta.env.VITE_API_URL + "reset-password/" + token, requestOptions)
-    .then(response => response.json())
-    .then(data => {
-        infoNotif("Votre mot de passe a bien été modifié.")
-        router.replace({name: "userLogin"})
+    .then(async (res) => {
+        const json = await res.json()
+        if (res.ok) {
+            infoNotif("Votre mot de passe a bien été modifié.")
+            router.replace({name: "userLogin"})
+        }
+        else {
+            errorNotif(json.message)
+            router.replace({name: "userLogin"})
+        }
     })
 }
 
